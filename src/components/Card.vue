@@ -1,19 +1,21 @@
 <template>
   <v-card
-    class="mx-auto"
-    max-width="344"
     outlined
     elevation="3"
   >
     <v-list-item three-line>
       <v-list-item-content>
-        <div class="text-overline mb-4 command-wrapper" style="white-space: nowrap;">
-          <span class="command">{{command}}</span>
+        <div
+          class="text-overline command-wrapper"
+          style="white-space: nowrap;"
+        >
+          <span class="command">{{trigger}}</span>
         </div>
         <v-list-item-title class=" mb-1">
-          <span>Voice: alexa</span>
+          <span>
+            <v-icon>mdi-microphone</v-icon> <i>"{{voice}}"</i>
+          </span>
         </v-list-item-title>
-        <br>
         <v-list-item-subtitle>
           <v-chip
             v-if="ground == 'foreground'"
@@ -27,7 +29,6 @@
             color="dark"
           >background
           </v-chip>
-
         </v-list-item-subtitle>
       </v-list-item-content>
 
@@ -45,6 +46,7 @@
         icon
         small
         color="warning"
+        @click.stop="showModal=true"
       >
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
@@ -52,47 +54,53 @@
         icon
         small
         color="error"
+        @click.stop="removeCommand()"
       >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn
+        icon
+        small
+        color="success"
+        :loading="loading"
+        @click.stop="loading=true"
+      >
+        <v-icon>mdi-play</v-icon>
+      </v-btn>
     </v-card-actions>
+    <Dialog
+      v-model="showModal"
+      :edit="true"
+      :dialogTitle="'Edit Command'"
+      :trigger="trigger"
+      :command="command"
+      :ground="ground"
+      :allowParams="allowParams"
+      :voice="voice"
+    />
+    <DialogConfirm ref="confirm" />
   </v-card>
 </template>
 
 <script>
+import Dialog from './Dialog.vue'
+import DialogConfirm from './DialogConfirm.vue'
+
 export default {
   name: 'MaterialCard',
-
+  components: {
+    Dialog,
+    DialogConfirm
+  },
+  data () {
+    return {
+      showModal: false,
+      loading: false
+    }
+  },
   props: {
     avatar: {
-      type: String,
-      default: ''
-    },
-    color: {
-      type: String,
-      default: 'success'
-    },
-    hoverReveal: {
-      type: Boolean,
-      default: false
-    },
-    icon: {
-      type: String,
-      default: undefined
-    },
-    image: {
-      type: Boolean,
-      default: false
-    },
-    inline: {
-      type: Boolean,
-      default: false
-    },
-    text: {
-      type: String,
-      default: ''
-    },
-    title: {
       type: String,
       default: ''
     },
@@ -103,28 +111,26 @@ export default {
     command: {
       type: String,
       default: ''
-    }
-  },
-  computed: {
-    classes () {
-      return {
-        'v-card--material--has-heading': this.hasHeading,
-        'v-card--material--hover-reveal': this.hoverReveal
-      }
     },
-    hasHeading () {
-      return Boolean(this.$slots.heading || this.title || this.icon)
+    trigger: {
+      type: String,
+      default: ''
     },
-    hasAltHeading () {
-      return Boolean(this.$slots.heading || (this.title && this.icon))
+    voice: {
+      type: String,
+      default: ''
+    },
+    allowParams: {
+      type: Boolean,
+      default: false
     }
   },
   created () {
-    this.getCommandSize()
-    window.addEventListener('resize', this.getCommandSize)
+    // this.getCommandSize()
+    // window.addEventListener('resize', this.getCommandSize)
   },
   destroyed () {
-    window.removeEventListener('resize', this.getCommandSize)
+    // window.removeEventListener('resize', this.getCommandSize)
   },
   methods: {
     getCommandSize () {
@@ -135,10 +141,44 @@ export default {
         console.log(commandElement[index].offsetWidth)
         console.log(wrapperElement[index].offsetWidth)
         if (commandElement[index].offsetWidth > wrapperElement[index].offsetWidth) {
-          console.log('entrou')
           wrapperElement.classList.add('animated')
         }
       })
+    },
+    async removeCommand () {
+      if (
+        await this.$refs.confirm.open(
+          'Confirm',
+          'Are you sure you want to delete this record?'
+        )
+      ) {
+        this.removeCommandService()
+      }
+    },
+    removeCommandService () {
+      return this.$http.delete('http://localhost:8000/command', {
+        data: {
+          trigger: this.trigger,
+          command: this.command,
+          ground: this.ground,
+          allowParams: this.allowParams.toString(),
+          voice: this.voice
+        }
+      })
+        .then(response => {
+          this.show = false
+          this.$root.$emit('reload', {})
+          this.$root.$emit('snackbar', {
+            color: 'success',
+            message: `"${this.trigger}" removed successfuly!`
+          })
+        })
+        .catch(err => {
+          this.$root.$emit('snackbar', {
+            color: 'error',
+            message: err.toString()
+          })
+        })
     }
   }
 }

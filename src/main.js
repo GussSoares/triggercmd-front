@@ -4,8 +4,12 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+import axios from 'axios'
 
 Vue.config.productionTip = false
+Vue.prototype.$http = axios.create({
+  baseURL: 'http://localhost:8000'
+})
 
 new Vue({
   router,
