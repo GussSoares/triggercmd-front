@@ -64,7 +64,7 @@
         small
         color="success"
         :loading="loading"
-        @click.stop="loading=true"
+        @click.stop="testCommandService()"
       >
         <v-icon>mdi-play</v-icon>
       </v-btn>
@@ -174,6 +174,24 @@ export default {
           })
         })
         .catch(err => {
+          this.$root.$emit('snackbar', {
+            color: 'error',
+            message: err.toString()
+          })
+        })
+    },
+    testCommandService () {
+      this.loading = true
+      return this.$http.get(`http://localhost:8000/test-command?trigger=${this.trigger}`)
+        .then(response => {
+          this.loading = false
+          this.$root.$emit('snackbar', {
+            color: 'success',
+            message: response.data.msg
+          })
+        })
+        .catch(err => {
+          this.loading = false
           this.$root.$emit('snackbar', {
             color: 'error',
             message: err.toString()
