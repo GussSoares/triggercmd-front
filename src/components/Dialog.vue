@@ -148,7 +148,7 @@ export default {
       }
     },
     editCommand () {
-      return this.$http.patch(`http://localhost:8000/command?old_title=${this.trigger}`, {
+      return this.$http.patch(`/command?old_title=${this.trigger}`, {
         trigger: this.form.trigger,
         command: this.form.command,
         ground: this.form.ground,
@@ -172,7 +172,7 @@ export default {
         })
     },
     createCommand () {
-      return this.$http.post('http://localhost:8000/command', {
+      return this.$http.post('/command', {
         trigger: this.form.trigger,
         command: this.form.command,
         ground: this.form.ground,

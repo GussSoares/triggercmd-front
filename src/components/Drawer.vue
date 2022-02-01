@@ -29,9 +29,15 @@
       >
         <v-list-item link>
           <v-list-item-icon>
+            <v-icon>mdi-monitor</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Computers</v-list-item-title>
+        </v-list-item>
+        <v-list-item link>
+          <v-list-item-icon>
             <v-icon>mdi-view-dashboard</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>My Commands</v-list-item-title>
+          <v-list-item-title>Commands</v-list-item-title>
         </v-list-item>
         <!-- <v-list-item link>
             <v-list-item-icon>

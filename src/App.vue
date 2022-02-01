@@ -1,11 +1,12 @@
 <template>
   <v-app>
-    <appbar v-model="drawer"></appbar>
-    <drawer v-model="drawer"></drawer>
+    <appbar v-model="drawer" v-if="this.$router.currentRoute.name !== 'Login'"></appbar>
+    <drawer v-model="drawer" v-if="this.$router.currentRoute.name !== 'Login'"></drawer>
     <v-main>
       <v-container fluid>
         <router-view />
         <v-btn
+          v-if="this.$router.currentRoute.name !== 'Login'"
           v-show="!hidden"
           color="pink"
           dark
@@ -19,7 +20,6 @@
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </v-container>
-
     </v-main>
     <Dialog
       v-model="showModal"
@@ -56,7 +56,11 @@ export default {
       voice: null
     }
     //
-  })
+  }),
+  created () {
+    console.log(this.$router.currentRoute.name)
+    console.log(process.env)
+  }
 }
 </script>
 

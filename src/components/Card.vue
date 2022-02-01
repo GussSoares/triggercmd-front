@@ -156,7 +156,7 @@ export default {
       }
     },
     removeCommandService () {
-      return this.$http.delete('http://localhost:8000/command', {
+      return this.$http.delete('/command', {
         data: {
           trigger: this.trigger,
           command: this.command,
@@ -182,7 +182,7 @@ export default {
     },
     testCommandService () {
       this.loading = true
-      return this.$http.get(`http://localhost:8000/test-command?trigger=${this.trigger}`)
+      return this.$http.get(`/test-command?trigger=${this.trigger}`)
         .then(response => {
           this.loading = false
           this.$root.$emit('snackbar', {
